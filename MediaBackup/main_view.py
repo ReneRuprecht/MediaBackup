@@ -1,12 +1,13 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import Frame, Label, Button
+from tkinter import ttk, filedialog
 from tkinter.messagebox import showerror
 
-from MediaBackup.constants import Colors, Texts
+from MediaBackup.constants import Colors, Texts, Buttons
 from MediaBackup.settings import Settings
 
 
 class View:
+
     def __init__(self, master, controller):
         self.frame = Frame(master)
 
@@ -24,7 +25,7 @@ class View:
         self.label_source_info.grid(row=2, column=1, sticky='nesw')
 
         self.btn_load = Button(self.frame, text="load",
-                               command=lambda: controller.load_items_to_table())
+                               command=lambda: controller.select_path(self.btn_load))
         self.btn_load.grid(row=3, column=1, sticky='nesw')
 
         self.btn_start = Button(self.frame, text="start",
@@ -39,14 +40,19 @@ class View:
                                  font=(Texts.HEADER_FONT, Texts.HEADER_SIZE))
         self.label_dest1.grid(row=1, column=5, sticky='nesw')
 
-        self.label_dest1_info = Label(self.frame, text="Wähle ein Zielverzeichnis aus", fg=Colors.TEXT_COLOR,
+        self.label_dest1_info = Label(self.frame, text="Wähle ein Kopier Zielverzeichnis aus", fg=Colors.TEXT_COLOR,
                                       bg=Colors.BACKGROUND_COLOR,
                                       font=(Texts.INFO_FONT, Texts.INFO_SIZE))
         self.label_dest1_info.grid(row=2, column=5, sticky='nesw')
 
-        self.btn_dest1 = Button(self.frame, text="dest1",
-                                command=lambda: "")
-        self.btn_dest1.grid(row=3, column=5, sticky='nesw')
+        self.btn_dest1 = Button(self.frame, text="dest1", width=Buttons.DEST_SIZE,
+                                command=lambda: controller.select_path(self.btn_dest1))
+        self.btn_dest1.grid(row=3, column=5)
+
+        self.label_dest1_path = Label(self.frame, fg=Colors.TEXT_COLOR,
+                                      bg=Colors.BACKGROUND_COLOR,
+                                      font=(Texts.INFO_FONT, Texts.INFO_SIZE))
+        self.label_dest1_path.grid(row=6, column=5, sticky='nesw')
 
         # Progressbar1
         self.progressbar_dest1 = ttk.Progressbar(self.frame, style="blue.Horizontal.TProgressbar",
@@ -65,9 +71,14 @@ class View:
                                       font=(Texts.INFO_FONT, Texts.INFO_SIZE))
         self.label_dest2_info.grid(row=2, column=10, sticky='nesw')
 
-        self.btn_dest2 = Button(self.frame, text="dest2",
-                                command=lambda: "")
-        self.btn_dest2.grid(row=3, column=10, sticky='nesw')
+        self.btn_dest2 = Button(self.frame, text="dest2", width=Buttons.DEST_SIZE,
+                                command=lambda: controller.select_path(self.btn_dest2))
+        self.btn_dest2.grid(row=3, column=10)
+
+        self.label_dest2_path = Label(self.frame, fg=Colors.TEXT_COLOR,
+                                      bg=Colors.BACKGROUND_COLOR,
+                                      font=(Texts.INFO_FONT, Texts.INFO_SIZE))
+        self.label_dest2_path.grid(row=6, column=10, sticky='nesw')
 
         # Progressbar2
         self.progressbar_dest2 = ttk.Progressbar(self.frame, style="blue.Horizontal.TProgressbar",
@@ -84,27 +95,27 @@ class View:
         self.table.heading(4, text="Hash")
 
         scroll = ttk.Scrollbar(self.frame, orient="vertical", command=self.table.yview)
-        scroll.grid(row=11, column=13, rowspan=12, stick="nesw")
+        scroll.grid(row=8, column=13, rowspan=12, stick="nesw")
         self.table.configure(yscrollcommand=scroll.set)
-
+        # end table
         Settings(self.frame)
 
         self.frame.pack(expand=True, fill="both")
 
     # start dest1 area
     def show_dest1_area(self):
-        self.label_dest1.grid(row=1, column=5, sticky='nesw')
+        # self.label_dest1.grid(row=1, column=5, sticky='nesw')
         self.label_dest1_info.grid(row=2, column=5, sticky='nesw')
-        self.btn_dest1.grid(row=3, column=5, sticky='nesw')
+        self.btn_dest1.grid(row=3, column=5)
 
     def hide_dest1_area(self):
-        self.label_dest1.grid_forget()
+        # self.label_dest1.grid_forget()
         self.label_dest1_info.grid_forget()
         self.btn_dest1.grid_forget()
 
     # progressbar_dest1
     def show_progressbar_dest1(self):
-        self.progressbar_dest1.grid(row=2, column=4, columnspan=3, rowspan=6, sticky='nesw')
+        self.progressbar_dest1.grid(row=2, column=5, rowspan=4, sticky='nesw')
 
     def hide_progressbar_dest1(self):
         self.progressbar_dest1.grid_forget()
@@ -124,18 +135,18 @@ class View:
 
     # start dest2 area
     def show_dest2_area(self):
-        self.label_dest2.grid(row=1, column=10, sticky='nesw')
+        # self.label_dest2.grid(row=1, column=10, sticky='nesw')
         self.label_dest2_info.grid(row=2, column=10, sticky='nesw')
-        self.btn_dest2.grid(row=3, column=10, sticky='nesw')
+        self.btn_dest2.grid(row=3, column=10)
 
     def hide_dest2_area(self):
-        self.label_dest2.grid_forget()
+        # self.label_dest2.grid_forget()
         self.label_dest2_info.grid_forget()
         self.btn_dest2.grid_forget()
 
     # progressbar_dest2
     def show_progressbar_dest2(self):
-        self.progressbar_dest2.grid(row=2, column=9, columnspan=3, rowspan=6, sticky='nesw')
+        self.progressbar_dest2.grid(row=2, column=10, rowspan=4, sticky='nesw')
 
     def hide_progressbar_dest2(self):
         self.progressbar_dest2.grid_forget()
@@ -160,22 +171,20 @@ class View:
 
         proressbar["value"] = value
 
-    def test_me(self):
-        file_array = [["C:/test/1.txt"], ["C:/test/1_1.txt"]]
-
-        for i in range(2):
-            self.table.insert('', 'end', values=(file_array[i][0], i))
-
-    @staticmethod
-    def get_item_in_table():
-        file_array = ["C:/test/1.txt", "C:/test/1_1.txt"]
-
     def fill_table(self, object_array):
         for i in object_array:
-            print(i.get_file_path())
             self.table.insert('', 'end',
                               values=(i.get_file_path(), i.get_file_name(), i.get_file_size(), i.get_file_md5()))
 
     @staticmethod
-    def showerror(header, text):
+    def show_error(header, text):
         showerror(header, text)
+
+    @staticmethod
+    def get_folder_path():
+        folder_name = filedialog.askdirectory()
+        return folder_name
+
+    @staticmethod
+    def set_label_text(label_object, text):
+        label_object['text'] = text

@@ -10,3 +10,7 @@ class Texts:
     HEADER_SIZE = 16
     INFO_FONT = "Helvetica"
     INFO_SIZE = 10
+
+
+class Buttons:
+    DEST_SIZE = 20

@@ -20,14 +20,18 @@ class Settings:
     @staticmethod
     def set_frame_grid_layout(frame):
         for i in range(20):
-            frame.grid_rowconfigure(i, weight=1, minsize=10)
+            # table rows
+            if i >= 8:
+                frame.grid_rowconfigure(i, minsize=20, weight=1)
+            # other rows
+            else:
+                frame.grid_rowconfigure(i, minsize=20)
+
         for i in range(13):
-            frame.grid_columnconfigure(i, weight=1, minsize=50)
-        # frame.grid_rowconfigure(0, weight=1, minsize=100)
-        # frame.grid_columnconfigure(0, weight=1, minsize=100)
-        # frame.grid_columnconfigure(1, weight=1, minsize=100)
-        # frame.grid_columnconfigure(2, weight=1, minsize=100)
-        # frame.grid_columnconfigure(3, weight=1, minsize=100)
-        # frame.grid_columnconfigure(4, weight=1, minsize=10)
-        # frame.grid_rowconfigure(1, weight=1, minsize=100)
-        frame.grid(row=1, columnspan=5, sticky='nesw')
+            # spacer columns
+            if i == 0 or i == 3 or i == 8:
+                frame.grid_columnconfigure(i, minsize=20)
+
+            # dest1 and dest2 columns
+            if i == 5 or i == 10:
+                frame.grid_columnconfigure(i, weight=2)
