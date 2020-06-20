@@ -14,3 +14,4 @@ class Texts:
 
 class Buttons:
     DEST_SIZE = 20
+    DB_SIZE = 1

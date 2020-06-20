@@ -41,12 +41,12 @@ class FileModel:
     def __set_file_total_size(self):
         size = os.path.getsize(self.__file_path)
         self.__file_size = size
-        if int(size / (1024 * 1024 * 1024)) > 0.0:
-            self.__file_size_with_ident = str(round(size / (1024 * 1024 * 1024), 2)) + " GB"
-        elif int(size / (1024 * 1024)) > 0.0:
-            self.__file_size_with_ident = str(round(size / (1024 * 1024), 2)) + " MB"
-        elif int(size / 1024) > 0.0:
-            self.__file_size_with_ident = str(size / 1024) + " KB"
+        if int(size / (1000 * 1000 * 1000)) > 0.0:
+            self.__file_size_with_ident = str(round(size / (1000 * 1000 * 1000), 2)) + " GB"
+        elif int(size / (1000 * 1000)) > 0.0:
+            self.__file_size_with_ident = str(round(size / (1000 * 1000), 2)) + " MB"
+        elif int(size / 1000) > 0.0:
+            self.__file_size_with_ident = str(size / 1000) + " KB"
         else:
             self.__file_size_with_ident = str(size) + " B"
 

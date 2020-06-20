@@ -1,23 +1,34 @@
 import sqlite3
 
+from MediaBackup.db_model import DbModel
 from MediaBackup.db_view import DbView
 
 
 class DbController:
     def __init__(self, master=None, db_enabled=False):
-
+        # contains error if a permissionerror will rise
+        self.__error = ""
+        # contains the choice if the user wants to create a database
         self.db_enabled = db_enabled
+
         if self.db_enabled:
-            self.db = sqlite3.connect('test.db')
+            # trys to create the database otherwise it will rise an exception
+            try:
+                self.db = sqlite3.connect('test.db')
+            except PermissionError:
+                self.__error = "Die Datenbank konnte nicht erstellt werden aufgrund von fehlenden Zugriffsrechten."
+                self.display_error_on_console()
+                return
+
             self.cursor = self.db.cursor()
-
+            # check if the table exists
             self.cursor.execute(''' SELECT name FROM sqlite_master WHERE type='table' AND name='test'; ''')
-
             exists = False
             elements = self.cursor.fetchall()
             if len(elements) >= 1:
                 exists = True
 
+            # if the table does not exists, create the table
             if not exists:
                 self.cursor.execute("""CREATE TABLE test (
                                             original_path text,
@@ -29,44 +40,64 @@ class DbController:
                                         )""")
                 self.db.commit()
                 self.db.close()
+
+        # set the view only if a frame is given
         if master is not None:
             self.db_view = DbView(master, self)
 
+    def display_error_on_console(self):
+        # displays the error on the console
+        if self.__error != "":
+            print(self.__error)
+
+    def get_error_message(self):
+        # returns the error, is used in the main.py to check if database is created
+        return self.__error
+
     def fill_table(self):
-        print("1")
+        # gets all database items and fills the table in the view
         db_object_array = self.get_all_data()
         self.db_view.fill_table(db_object_array)
 
-    def insert(self, original_path, new_path, filename, size, file_type, md5):
+    # original_path, new_path, filename, size, file_type, md5
+    def insert(self, db_object):
+        db_object_dict = db_object.get_object_dict()
 
-        if not self.check_if_data_exists(original_path, new_path, filename, size, file_type, md5):
+        # inserts a new entry into the database if the entry does not exists
+        if not self.check_if_data_exists(db_object):
             db = sqlite3.connect('test.db')
             cursor = db.cursor()
             cursor.execute(
-                "INSERT INTO test VALUES('{}','{}', '{}','{}', '{}','{}');".format(original_path, new_path, filename, size,
-                                                                                   file_type,
-                                                                                   md5))
+                "INSERT INTO test VALUES('{}','{}', '{}','{}', '{}','{}');".format(db_object_dict['original_path'],
+                                                                                   db_object_dict['new_path'],
+                                                                                   db_object_dict['filename'],
+                                                                                   db_object_dict['size'],
+                                                                                   db_object_dict['type'],
+                                                                                   db_object_dict['md5']))
             db.commit()
             cursor.close()
-        else:
-            print("Data existiert bereits")
+        # else:
+        #    print("Data existiert bereits")
 
     @staticmethod
-    def check_if_data_exists(original_path, new_path, filename, size, file_type, md5):
+    def check_if_data_exists(db_object):
+        db_object_dict = db_object.get_object_dict()
+        # checks if the data exists that the user wants to add
         db = sqlite3.connect('test.db')
         cursor = db.cursor()
         cursor.execute(
             "SELECT * FROM test WHERE original_path='{}' AND new_path='{}'  AND filename='{}'"
             " AND size='{}' AND type='{}' AND md5='{}';".format(
-                original_path, new_path
-                , filename, size, file_type,
-                md5))
-
+                db_object_dict['original_path'],
+                db_object_dict['new_path'],
+                db_object_dict['filename'],
+                db_object_dict['size'],
+                db_object_dict['type'],
+                db_object_dict['md5']))
         exists = False
         elements = cursor.fetchall()
         if len(elements) >= 1:
             exists = True
-
         db.commit()
         cursor.close()
 
@@ -74,15 +105,20 @@ class DbController:
 
     @staticmethod
     def get_all_data():
+        # returns an db object array with all entrys from the database
         db = sqlite3.connect('test.db')
         cursor = db.cursor()
         cursor.execute("SELECT * FROM test;")
         elements = cursor.fetchall()
+
         db_object_array = []
         for i in elements:
-            dbx = {'original_path': i[0], 'new_path': i[1], 'filename': i[2], 'size': i[3], 'type': i[4],
-                   'md5': i[5]}
-            db_object_array.append(dbx)
+            db_object = DbModel(i[0], i[1],
+                                i[2], i[3],
+                                i[4], i[5]
+                                )
+
+            db_object_array.append(db_object)
         db.commit()
         cursor.close()
         return db_object_array
