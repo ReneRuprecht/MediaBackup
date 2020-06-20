@@ -3,7 +3,7 @@ from tkinter import ttk
 from MediaBackup.constants import Colors
 
 
-class Settings:
+class MainViewStyle:
     def __init__(self, frame):
         self.set_style()
         self.set_frame_grid_layout(frame)
@@ -16,6 +16,7 @@ class Settings:
         ttk_style.configure("yellow.Horizontal.TProgressbar", foreground='yellow', background='yellow')
         ttk_style.configure("blue.Horizontal.TProgressbar", foreground='blue', background='blue')
         ttk_style.configure("green.Horizontal.TProgressbar", foreground='green', background='green')
+        ttk_style.configure("red.Horizontal.TProgressbar", foreground='red', background='red')
 
     @staticmethod
     def set_frame_grid_layout(frame):
@@ -32,6 +33,19 @@ class Settings:
             if i == 0 or i == 3 or i == 8:
                 frame.grid_columnconfigure(i, minsize=20)
 
-            # dest1 and dest2 columns
+            # copy and backup columns
             if i == 5 or i == 10:
                 frame.grid_columnconfigure(i, weight=2)
+
+
+class DbViewStyle:
+    def __init__(self, frame):
+        self.set_frame_grid_layout_db_view(frame)
+        frame.configure(bg=Colors.BACKGROUND_COLOR)
+
+    @staticmethod
+    def set_frame_grid_layout_db_view(frame):
+        for i in range(13):
+            frame.grid_columnconfigure(i, minsize=20, weight=1)
+        for i in range(13):
+            frame.grid_rowconfigure(i, minsize=20, weight=2)
