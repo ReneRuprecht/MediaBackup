@@ -11,7 +11,6 @@ class MainView:
     def __init__(self, master, controller):
         self.frame = Frame(master)
         self.frame.pack(expand=True, fill="both")
-
         # start source related area
         self.label_source = Label(self.frame, text="Quelle", fg=Colors.TEXT_COLOR,
                                   bg=Colors.BACKGROUND_COLOR,
@@ -23,11 +22,11 @@ class MainView:
                                        font=(Texts.INFO_FONT, Texts.INFO_SIZE))
         self.label_source_info.grid(row=2, column=1, sticky='nesw')
 
-        self.btn_load = Button(self.frame, text="Quelle wählen",
+        self.btn_load = Button(self.frame, text="Quelle wählen", width=Buttons.DEST_SIZE,
                                command=lambda: controller.select_path(self.btn_load))
         self.btn_load.grid(row=3, column=1, sticky='nesw')
 
-        self.btn_start = Button(self.frame, text="Kopieren starten",
+        self.btn_start = Button(self.frame, text="Kopieren starten", width=Buttons.DEST_SIZE,
                                 command=lambda: controller.start_copy_thread())
 
         self.btn_start.grid(row=6, column=1, sticky='nesw')

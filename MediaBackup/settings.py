@@ -47,5 +47,7 @@ class DbViewStyle:
     def set_frame_grid_layout_db_view(frame):
         for i in range(13):
             frame.grid_columnconfigure(i, minsize=20, weight=1)
+
         for i in range(13):
-            frame.grid_rowconfigure(i, minsize=20, weight=2)
+            if i > 0:
+                frame.grid_rowconfigure(i, minsize=20, weight=1)

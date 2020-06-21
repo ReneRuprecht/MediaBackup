@@ -7,6 +7,7 @@ from MediaBackup.settings import DbViewStyle
 class DbView:
     def __init__(self, master, controller):
         self.frame = Toplevel(master)
+        self.frame.title("DB View")
         self.btn_load = Button(self.frame, text="Lese Datenbank",
                                command=lambda: controller.fill_table())
         self.btn_load.grid(row=0, column=0, sticky='nesw')

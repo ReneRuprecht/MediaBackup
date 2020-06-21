@@ -109,6 +109,7 @@ class MainController:
             md5_status = self.check_md5(src_file_array, dest_file_array, progressbar)
             if md5_status:
                 self.view.set_progressbar_style(progressbar, "Green")
+                self.view.set_label_text(self.view.label_copy, "Kopieren erfolgreich")
             else:
                 self.view.show_messagebox("Error", "MD5 check Fehlerhaft", "Beim MD5 Check trat ein Fehler auf")
                 self.view.set_progressbar_style(progressbar, "Red")
@@ -139,6 +140,7 @@ class MainController:
                 md5_status = self.check_md5(src_file_array, dest_file_array, progressbar)
                 if md5_status:
                     self.view.set_progressbar_style(progressbar, "Green")
+                    self.view.set_label_text(self.view.label_backup, "Kopieren erfolgreich")
                 else:
                     self.view.show_messagebox("Error", "MD5 check Fehlerhaft", "Beim MD5 Check trat ein Fehler auf")
                     self.view.set_progressbar_style(progressbar, "Red")
@@ -196,7 +198,14 @@ class MainController:
                 if not os.path.exists(dest_file):
                     # copies the src_file to the new path
                     shutil.copy(src_file, dest_file)
-
+                else:
+                    tmp_src_array = [src_file]
+                    tmp_dest_array = [dest_file]
+                    if not self.check_md5(tmp_src_array, tmp_dest_array):
+                        new_file_name = str(file).split('.')[0] + "_old"
+                        new_file_name_ext = "." + str(file).split('.')[1]
+                        os.rename(dest_file, os.path.join(dest_path, new_file_name + new_file_name_ext))
+                        shutil.copy(src_file, dest_file)
                 # checks if a progressbar is set
                 if progressbar is not None:
                     # increments the value

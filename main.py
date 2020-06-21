@@ -12,6 +12,7 @@ args = parser.parse_args()
 
 def start(db_enabled, db_controller=None):
     root = Tk()
+    root.wm_title("Main")
     # root.resizable(width=False, height=False)
     MainController(root, db_enabled, db_controller)
     root.mainloop()
@@ -19,7 +20,7 @@ def start(db_enabled, db_controller=None):
 
 if __name__ == "__main__":
     argument = sys.argv[1].lower()
-    if argument[:1] == "y" or argument[:1] == "j":
+    if argument[:1] == "y":
         # DbController call Frame=None but with db_enabled=True
         db_controller = DbController(None, True)
         # check if database is created without permission error
