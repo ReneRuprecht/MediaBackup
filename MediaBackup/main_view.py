@@ -155,6 +155,10 @@ class MainView:
                                   i.get_file_path(), i.get_file_name(), i.get_file_size_with_ident(),
                                   i.get_file_type()))
 
+    def clear_table(self):
+        # clears the table
+        self.table.delete(*self.table.get_children())
+
     @staticmethod
     def get_folder_path_from_file_dialog():
         # shows the folderdialog and returns the selected folder

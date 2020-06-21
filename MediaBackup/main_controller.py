@@ -13,9 +13,9 @@ class MainController:
         self.view = MainView(master, self)
         self.db_view = None
         self.master = master
-        # check if db is enabled and a db object was created
         self.db_controller = None
         self.db_enabled = db_enabled
+        # check if db is enabled and a db object was created
         if db_enabled and db is not None:
             self.db_enabled = db_enabled
             self.db_controller = db
@@ -30,8 +30,9 @@ class MainController:
         self.thread_running = False
 
     def start_copy_thread(self):
-        # checks if everything that is needed is set.
+
         # checks if a thread is already running, to prevent the user from starting more than one operation
+        # checks if everything that is needed is set.
         # if there is not thread running it will start a new thread.
 
         # check if thread is already running
@@ -73,7 +74,7 @@ class MainController:
 
         # contains all files
         files_array = []
-        # contains all folders
+        # contains all folders for the mkdir
         folder_array = []
         # contains the selection of the table
         table_selection = self.view.table.selection()
@@ -98,25 +99,31 @@ class MainController:
         self.view.show_progressbar_copy()
         self.set_progressbar_max_value(progressbar, len(files_array))
         # starts the copy process for the copy_path
-        copy_status, src_file_array, dest_file_array = self.copy_to_dest(folder_array, files_array, self.copy_path,
-                                                                         progressbar)
+        copy_status, error, src_file_array, dest_file_array = self.copy_to_dest(folder_array, files_array,
+                                                                                self.copy_path,
+                                                                                progressbar)
 
         # if the copy_status is true, that means the copy process went fine
         if copy_status:
             # sets the label text to the new heading
             self.view.set_label_text(self.view.label_copy, "Prüfe MD5 Hashes")
             # starts the md5 check
-            md5_status = self.check_md5(src_file_array, dest_file_array, progressbar)
+            md5_status, error = self.check_md5(src_file_array, dest_file_array, progressbar)
             if md5_status:
                 self.view.set_progressbar_style(progressbar, "Green")
                 self.view.set_label_text(self.view.label_copy, "Kopieren erfolgreich")
             else:
-                self.view.show_messagebox("Error", "MD5 check Fehlerhaft", "Beim MD5 Check trat ein Fehler auf")
                 self.view.set_progressbar_style(progressbar, "Red")
+                self.view.set_label_text(self.view.label_copy, "MD5 check Fehlerhaft")
+                self.view.show_messagebox("Error", "MD5 check Fehlerhaft", error)
+                self.reset(True)
                 return
         else:
+            self.view.set_progressbar_style(progressbar, "Red")
+            self.view.set_label_text(self.view.label_copy, "Kopieren Fehlgeschlagen")
             self.view.show_messagebox("Error", "Kopieren Fehlgeschlagen",
-                                      "Es ist ein Fehler beim Kopieren aufgetreten")
+                                      error)
+            self.reset(True)
             return
 
         # checks if the backup_path is set
@@ -130,35 +137,44 @@ class MainController:
             self.view.show_progressbar_backup()
             self.set_progressbar_max_value(progressbar, len(files_array))
             # starts the copy process for the backup_path
-            backup_status, src_file_array, dest_file_array = self.copy_to_dest(folder_array, files_array,
-                                                                               self.backup_path, progressbar)
+            backup_status, error, src_file_array, dest_file_array = self.copy_to_dest(folder_array, files_array,
+                                                                                      self.backup_path, progressbar)
             # if the backup_status is true, that means the copy process went fine
             if backup_status:
                 # sets the label text to the new heading
                 self.view.set_label_text(self.view.label_backup, "Prüfe MD5 Hashes")
                 # starts the md5 check
-                md5_status = self.check_md5(src_file_array, dest_file_array, progressbar)
+                md5_status, error = self.check_md5(src_file_array, dest_file_array, progressbar)
                 if md5_status:
-                    self.view.set_progressbar_style(progressbar, "Green")
                     self.view.set_label_text(self.view.label_backup, "Kopieren erfolgreich")
+                    self.view.set_progressbar_style(progressbar, "Green")
                 else:
-                    self.view.show_messagebox("Error", "MD5 check Fehlerhaft", "Beim MD5 Check trat ein Fehler auf")
                     self.view.set_progressbar_style(progressbar, "Red")
+                    self.view.set_label_text(self.view.label_backup, "MD5 check Fehlerhaft")
+                    self.view.show_messagebox("Error", "MD5 check Fehlerhaft", error)
+                    self.reset(True)
                     return
             else:
+                self.view.set_progressbar_style(progressbar, "Red")
+                self.view.set_label_text(self.view.label_backup, "Kopieren Fehlgeschlagen")
                 self.view.show_messagebox("Error", "Kopieren Fehlgeschlagen",
-                                          "Es ist ein Fehler beim Kopieren aufgetreten")
+                                          error)
+                self.reset(True)
                 return
 
+            # everything is finished with the backup path set
             self.view.show_messagebox("Info", "Kopieren Erfolgreich", "Die Daten wurden erfolgreich kopiert")
 
         else:
-            # checks the copy status
+            # everything is finished without the backup path set
             if copy_status:
+                self.view.set_label_text(self.view.label_copy, "Kopieren erfolgreich")
+                self.view.set_progressbar_style(progressbar, "Green")
                 # shows a messagebox that all went fine
                 self.view.show_messagebox("Info", "Kopieren Erfolgreich", "Die Daten wurden erfolgreich kopiert")
-
             else:
+                self.view.set_label_text(self.view.label_copy, "Kopieren Fehlgeschlagen")
+                self.view.set_progressbar_style(progressbar, "Red")
                 # shows a messagebox that something went wrong
                 self.view.show_messagebox("Error", "Kopieren Fehlgeschlagen",
                                           "Es ist ein Fehler beim Kopieren aufgetreten")
@@ -177,6 +193,8 @@ class MainController:
         src_file_array = []
         # contains all the dest files
         dest_file_array = []
+
+        error = ""
 
         # creates directorys if they are not already existing
         for folder in folder_array:
@@ -213,17 +231,19 @@ class MainController:
                     # updates the progressbar value
                     self.view.update_progressbar_value(progressbar, value)
             except FileNotFoundError:
-                self.view.show_messagebox("Error", "Datei nicht gefunden",
-                                          "Die Datei " + file + " konnte nicht gefunden werden")
+                error = "Die Datei " + file + " konnte nicht gefunden werden"
+                # self.view.show_messagebox("Error", "Datei nicht gefunden",
+                #                         "Die Datei " + file + " konnte nicht gefunden werden")
 
-                return False, [], []
+                return False, error, [], []
             except PermissionError:
-                self.view.show_messagebox("Error", "Keine Zugriffsrechte",
-                                          "Die Datei " + file + " konnte nicht kopiert werden")
+                error = "Die Datei " + file + " konnte nicht kopiert werden"
+                # self.view.show_messagebox("Error", "Keine Zugriffsrechte",
+                #                         "Die Datei " + file + " konnte nicht kopiert werden")
 
-                return False, [], []
+                return False, error, [], []
 
-        return True, src_file_array, dest_file_array
+        return True, error, src_file_array, dest_file_array
 
     def check_md5(self, src_files_array, dest_files_array, progressbar=None):
         # checks if the files_array and dest_array have the same length
@@ -234,6 +254,8 @@ class MainController:
 
         # value is used to set the value on the progressbar
         value = 0
+
+        error = ""
 
         # checks if the arrays have the same length, otherwise something is wrong
         if len(src_files_array) == len(dest_files_array):
@@ -260,7 +282,8 @@ class MainController:
                     if src_file_md5 != dest_file_md5:
                         # sets the status to false and returns the status
                         status = False
-                        return status
+                        error = "Der MD5 Hash stimmt nicht mit der Quelldatei überein"
+                        return status, error
                     # if the md5 hashes are equal, the value gets incremented
                     value += 1
 
@@ -277,16 +300,14 @@ class MainController:
                         self.view.update_progressbar_value(progressbar, value)
 
                 except FileNotFoundError:
-                    self.view.set_progressbar_style(progressbar, "red")
-                    self.view.show_messagebox("Error", "Datei nicht gefunden",
-                                              "Die Datei " + src_files_array[i] + " konnte nicht gefunden werden")
-
-                    return False
+                    error = "Die Datei " + src_files_array[i] + " konnte nicht gefunden werden"
+                    return False, error
 
         else:
-            return False
+            error = "Die Daten sind nicht vollständig"
+            return False, error
 
-        return True
+        return True, error
 
     def open_db_view(self):
         self.db_controller = DbController(self.master, self.db_enabled)
@@ -352,7 +373,10 @@ class MainController:
         # returns the files_array
         return files_array
 
-    def reset(self):
+    def reset(self, full=False):
+        if full:
+            self.view.clear_table()
+
         # resets the gui elements
         self.copy_path = ""
         self.backup_path = ""
