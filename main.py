@@ -27,7 +27,8 @@ if __name__ == "__main__":
         if db_controller.get_error_message() == "":
             # start the application with db_enabled=True and the db controller
             start(True, db_controller)
-
+        else:
+            print(db_controller.get_error_message())
     elif argument[:1] == "n":
         # start the applictation without database
         start(False)

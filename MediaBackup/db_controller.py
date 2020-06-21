@@ -6,6 +6,7 @@ from MediaBackup.db_view import DbView
 
 class DbController:
     def __init__(self, master=None, db_enabled=False):
+        self.db_name = "MediaBackup.db"
         # contains error if a permissionerror will rise
         self.__error = ""
         # contains the choice if the user wants to create a database
@@ -14,7 +15,7 @@ class DbController:
         if self.db_enabled:
             # trys to create the database otherwise it will rise an exception
             try:
-                self.db = sqlite3.connect('test.db')
+                self.db = sqlite3.connect(self.db_name)
             except PermissionError:
                 self.__error = "Die Datenbank konnte nicht erstellt werden aufgrund von fehlenden Zugriffsrechten."
                 self.display_error_on_console()
@@ -22,7 +23,7 @@ class DbController:
 
             self.cursor = self.db.cursor()
             # check if the table exists
-            self.cursor.execute(''' SELECT name FROM sqlite_master WHERE type='table' AND name='test'; ''')
+            self.cursor.execute(''' SELECT name FROM sqlite_master WHERE type='table' AND name='files'; ''')
             exists = False
             elements = self.cursor.fetchall()
             if len(elements) >= 1:
@@ -30,7 +31,7 @@ class DbController:
 
             # if the table does not exists, create the table
             if not exists:
-                self.cursor.execute("""CREATE TABLE test (
+                self.cursor.execute("""CREATE TABLE files (
                                             original_path text,
                                             new_path text,
                                             filename text,
@@ -65,28 +66,27 @@ class DbController:
 
         # inserts a new entry into the database if the entry does not exists
         if not self.check_if_data_exists(db_object):
-            db = sqlite3.connect('test.db')
+            db = sqlite3.connect(self.db_name)
             cursor = db.cursor()
             cursor.execute(
-                "INSERT INTO test VALUES('{}','{}', '{}','{}', '{}','{}');".format(db_object_dict['original_path'],
-                                                                                   db_object_dict['new_path'],
-                                                                                   db_object_dict['filename'],
-                                                                                   db_object_dict['size'],
-                                                                                   db_object_dict['type'],
-                                                                                   db_object_dict['md5']))
+                "INSERT INTO files VALUES('{}','{}', '{}','{}', '{}','{}');".format(db_object_dict['original_path'],
+                                                                                    db_object_dict['new_path'],
+                                                                                    db_object_dict['filename'],
+                                                                                    db_object_dict['size'],
+                                                                                    db_object_dict['type'],
+                                                                                    db_object_dict['md5']))
             db.commit()
             cursor.close()
         # else:
         #    print("Data existiert bereits")
 
-    @staticmethod
-    def check_if_data_exists(db_object):
+    def check_if_data_exists(self, db_object):
         db_object_dict = db_object.get_object_dict()
         # checks if the data exists that the user wants to add
-        db = sqlite3.connect('test.db')
+        db = sqlite3.connect(self.db_name)
         cursor = db.cursor()
         cursor.execute(
-            "SELECT * FROM test WHERE original_path='{}' AND new_path='{}'  AND filename='{}'"
+            "SELECT * FROM files WHERE original_path='{}' AND new_path='{}'  AND filename='{}'"
             " AND size='{}' AND type='{}' AND md5='{}';".format(
                 db_object_dict['original_path'],
                 db_object_dict['new_path'],
@@ -103,12 +103,11 @@ class DbController:
 
         return exists
 
-    @staticmethod
-    def get_all_data():
+    def get_all_data(self):
         # returns an db object array with all entrys from the database
-        db = sqlite3.connect('test.db')
+        db = sqlite3.connect(self.db_name)
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM test;")
+        cursor.execute("SELECT * FROM files;")
         elements = cursor.fetchall()
 
         db_object_array = []
