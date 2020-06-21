@@ -1,16 +1,16 @@
 # Beschreibung
 
-Dies ist mein erstes Python und TKinter Projekt und dient als Versuchsobjekt was man noch so sinnvolles hinzufügen kann. Die Idee war es ein Programm zu entwickeln das Daten von Punkt A nach B und C kopiert ohne Fehler beim Kopiervorgang. 
+Dies ist mein erstes Python und TKinter Projekt und dient als Versuchsobjekt was man noch so Sinnvolles hinzufügen kann. Die Idee war es ein Programm zu entwickeln das Daten von Punkt A nach B und C kopiert ohne Fehler beim Kopiervorgang. Zusätzlich zum Kopieren besteht die Möglichkeit, nach erfolgreichem kopieren, die Infos über die Dateien in eine Datenbank zu speichern. Es wird hierbei vorerst eine SQLite Datenbank verwendet. 
 ![Main Bereich](https://cdn.discordapp.com/attachments/724282844419194982/724289139536822312/main_view.jpg)
 
 # Wofür kann ich das Programm verwenden?
 
-Wenn Sie Wert legen das Ihre Dateien beim kopieren immer sicher an die neuen Orte gelangen, sind Sie hier genau richtig. Dieses Programm prüft nach jedem Kopiervorgang ob der MD5 Hash von dem original und der neuen Datei übereinstimmt. Sollte der Hash nicht übereinstimmen, werden Sie darüber informiert. 
+Wenn Sie Wert legen das Ihre Dateien beim Kopieren immer sicher an die neuen Orte gelangen, sind Sie hier genau richtig. Dieses Programm prüft nach jedem Kopiervorgang ob der MD5 Hash von dem Original und der neuen Datei übereinstimmt. Sollte der Hash nicht übereinstimmen, werden Sie darüber informiert.
 
 
 # Wozu ein solches Programm?
 
-Man kennt es, man will schnell etwas kopieren und aus welchem Grund auch immer ist die Datei auf einmal fehlerhaft und die original Datei bereits gelöscht. Damit man sich nun sicher sein kann, ob die Dateien alle korrekt und fehlerfrei am Zielort angekommen sind, habe ich dieses Programm geschrieben.
+Man kennt es, man will schnell etwas kopieren und aus welchem Grund auch immer ist die Datei auf einmal fehlerhaft und die originale Datei bereits gelöscht. Damit man sich nun sicher sein kann, ob die Dateien alle korrekt und fehlerfrei am Zielort angekommen sind, habe ich dieses Programm geschrieben.
 
 # Wie kann ich es benutzen?
 
@@ -55,12 +55,12 @@ An mit dem Argument y wird der Oberfläche ein kleiner Button am oberen rechten 
 ## Was passiert nach dem Klick auf Kopieren starten
 Das Programm erfasst Ihre ausgewählten Dateien und kopiert diese an denen von Ihnen gewünschten Zielorte.
 Dies wird visualisiert anhand von Fortschritts-leisten und deren Farbe. 
-- Blau steht für das kopieren von Dateien 
+- Blau steht für das Kopieren von Dateien 
 - Gelb für die Prüfung von Hash-werten
 - Grün für den fehlerfreien Ablauf des Programms  
 - Rot für einen Fehler
 
-Sobald das Kopieren fehlerfrei abgelaufen ist, vergleicht das Programm die Hash-werte von der original Datei und der Datei am neuen Zielort.
+Sobald das Kopieren fehlerfrei abgelaufen ist, vergleicht das Programm die Hash-werte von der originalen Datei und der Datei am neuen Zielort.
 Sie werden benachrichtigt ob der Ablauf fehlerfrei verlief oder ob es zu einem Fehler kam.
 ![Erfolgreicher Ablauf](https://cdn.discordapp.com/attachments/724282844419194982/724289929320071218/unknown.png)
 
