@@ -5,19 +5,19 @@ Dies ist mein erstes Python und TKinter Projekt und dient als Versuchsobjekt was
 
 # Wofür kann ich das Programm verwenden?
 
-Wenn Sie Wert legen das Ihre Dateien beim kopieren immer sicher an die neuen Orte gelangt sind Sie hier genau richtig. Dieses Programm prüft nach jedem Kopiervorgang ob der MD5 Hash von dem original und der neuen Datei übereinstimmt. Sollte der Hash nicht übereinstimmen, werden Sie darüber informiert. 
+Wenn Sie Wert legen das Ihre Dateien beim kopieren immer sicher an die neuen Orte gelangen, sind Sie hier genau richtig. Dieses Programm prüft nach jedem Kopiervorgang ob der MD5 Hash von dem original und der neuen Datei übereinstimmt. Sollte der Hash nicht übereinstimmen, werden Sie darüber informiert. 
 
 
 # Wozu ein solches Programm?
 
-Man kennt es, man will schnell etwas kopieren und aus welchem Grund auch immer ist die Datei auf einmal fehlerhaft und die original Datei bereits gelöscht. Damit man sich nun sicher sein kann ob die Dateien alle korrekt und fehlerfrei am Zielort angekommen sind, habe ich dieses Programm geschrieben.
+Man kennt es, man will schnell etwas kopieren und aus welchem Grund auch immer ist die Datei auf einmal fehlerhaft und die original Datei bereits gelöscht. Damit man sich nun sicher sein kann, ob die Dateien alle korrekt und fehlerfrei am Zielort angekommen sind, habe ich dieses Programm geschrieben.
 
 # Wie kann ich es benutzen?
 
-Clonen Sie zunächst die Repo mit git clone XX.
-Wechseln sie danach in das Verzeichnis YY.
+Clonen Sie zunächst die Repo mit git clone https://github.com/ReneRup/MediaBackup.git.
+Wechseln sie danach in das Verzeichnis MediaBackup.
 Starten Sie die main.py mit python main.py -y oder python main.py -n.
-Die Argumente n und y geben an ob Sie wünschen das eine lokale SQLite erstellt werden soll.
+Die Argumente y und n geben an ob Sie wünschen das eine lokale SQLite erstellt werden soll.
 In der Datenbank stehen Infos zu den vollständig kopierten Dateien.
 > git clone https://github.com/ReneRup/MediaBackup.git  
 > cd MediaBackup  
