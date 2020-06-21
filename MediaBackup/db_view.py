@@ -31,6 +31,10 @@ class DbView:
         DbViewStyle(self.frame)
 
     def fill_table(self, db_object_array):
+        if len(db_object_array) == 0:
+            self.show_messagebox("Info", "Keine Einträge vorhanden",
+                                 "Es sind noch keine Einträge in der Datenbank vorhanden")
+            return
         # fills the table with the file informations
         self.table.delete(*self.table.get_children())
         for db_object in db_object_array:

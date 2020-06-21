@@ -25,9 +25,7 @@ class MainController:
         self.copy_path = ""
         self.backup_path = ""
         # will contain the thread object
-        self.copy_to_dests_thread = None
-        # contains if a thread is running, to prevent double execution
-        self.thread_running = False
+        self.copy_to_dests_thread = threading.Thread()
 
     def start_copy_thread(self):
 
@@ -36,7 +34,8 @@ class MainController:
         # if there is not thread running it will start a new thread.
 
         # check if thread is already running
-        if not self.thread_running:
+        if not self.copy_to_dests_thread.is_alive():
+            self.copy_to_dests_thread = threading.Thread(target=self.copy_procedure, args=())
             if self.copy_path == "":
                 self.view.show_messagebox("Error", "Pfad fehlt", "Wählen Sie einen Ziel-Pfad aus")
                 return
@@ -58,9 +57,7 @@ class MainController:
                 return
 
             # starts the thread
-            self.copy_to_dests_thread = threading.Thread(target=self.copy_procedure, args=())
             self.copy_to_dests_thread.start()
-            self.thread_running = True
 
     def copy_procedure(self):
         # grabs alls the selected items from the table.
@@ -98,6 +95,7 @@ class MainController:
         # shows the progressbar on the kopieren side of the guid
         self.view.show_progressbar_copy()
         self.set_progressbar_max_value(progressbar, len(files_array))
+
         # starts the copy process for the copy_path
         copy_status, error, src_file_array, dest_file_array = self.copy_to_dest(folder_array, files_array,
                                                                                 self.copy_path,
@@ -155,6 +153,8 @@ class MainController:
                     self.reset(True)
                     return
             else:
+                print("1")
+                print(self.copy_to_dests_thread.isAlive())
                 self.view.set_progressbar_style(progressbar, "Red")
                 self.view.set_label_text(self.view.label_backup, "Kopieren Fehlgeschlagen")
                 self.view.show_messagebox("Error", "Kopieren Fehlgeschlagen",
@@ -182,10 +182,11 @@ class MainController:
         self.reset()
 
     def copy_to_dest(self, folder_array, files_array, dest_path, progressbar=None):
+
         # copies files to dest_path.
         # changes the value of a progressbar if there is one given to this function
-        # returns true, src_file_array and the dest_file_array if everything went fine
-        # else an error will be displayed and return false
+        # returns true, error, src_file_array and the dest_file_array if everything went fine
+        # the error will be emtpy if there was no error
 
         # value contains the progressbar value
         value = 0
@@ -193,14 +194,18 @@ class MainController:
         src_file_array = []
         # contains all the dest files
         dest_file_array = []
-
+        # contains the error message
         error = ""
 
         # creates directorys if they are not already existing
         for folder in folder_array:
             new_folder = os.path.join(dest_path, folder)
             if not os.path.exists(new_folder):
-                self.makedirs(new_folder)
+                try:
+                    self.makedirs(new_folder)
+                except PermissionError:
+                    error = "Der Ordner " + new_folder + " konnte nicht erstellt werden"
+                    return False, error, [], []
 
         for file in files_array:
             try:
@@ -250,11 +255,12 @@ class MainController:
         # otherwise it will return False and wont start checking md5.
         # if the arrays have equal length, the progressbar will turn yellow, the header text will change
         # and compares the md5 hash from the original and new file.
-        # The function will return true or false depending on the end result
+        # The function will return true or false depending on the end result and error
+        # error will be empty if there was no error
 
         # value is used to set the value on the progressbar
         value = 0
-
+        # contains the error message
         error = ""
 
         # checks if the arrays have the same length, otherwise something is wrong
@@ -334,7 +340,7 @@ class MainController:
 
     def select_path(self, dest_button):
         # is used to set the paths of the root, copy and backup variables
-        if not self.thread_running:
+        if not self.copy_to_dests_thread.isAlive():
             if dest_button['text'].lower() == "kopierpfad wählen":
                 self.copy_path = self.view.get_folder_path_from_file_dialog()
                 if self.copy_path != "":
@@ -381,4 +387,3 @@ class MainController:
         self.copy_path = ""
         self.backup_path = ""
         self.view.reset_form()
-        self.thread_running = False
